@@ -1,0 +1,254 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f8f7f4;
+  --foreground: #1a1a1a;
+  --card: #ffffff;
+  --card-foreground: #1a1a1a;
+  --primary: #1a1a1a;
+  --primary-foreground: #fafafa;
+  --secondary: #efede8;
+  --secondary-foreground: #1a1a1a;
+  --muted-foreground: #737373;
+  --border: #e5e2dc;
+  --agree: #22c55e;
+  --agree-foreground: #ffffff;
+  --disagree: #ef4444;
+  --disagree-foreground: #ffffff;
+  --map-neutral-top: #e4e4e1;
+  --map-neutral-bottom: #cfcfcc;
+  --map-agree-top: #4ade80;
+  --map-agree-bottom: #16a34a;
+  --map-disagree-top: #fb7185;
+  --map-disagree-bottom: #e11d48;
+  --map-agree-glow: #39ff88;
+  --map-disagree-glow: #ff3b5c;
+  --map-stroke: rgba(26, 26, 26, 0.12);
+  --map-stroke-hover: rgba(26, 26, 26, 0.28);
+  --map-plate: rgba(255, 255, 255, 0.55);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #111110;
+    --foreground: #f5f5f4;
+    --card: #1c1c1a;
+    --card-foreground: #f5f5f4;
+    --primary: #f5f5f4;
+    --primary-foreground: #1a1a1a;
+    --secondary: #262624;
+    --secondary-foreground: #f5f5f4;
+    --muted-foreground: #a3a3a3;
+    --border: #333330;
+    --agree: #16a34a;
+    --agree-foreground: #ffffff;
+    --disagree: #dc2626;
+    --disagree-foreground: #ffffff;
+    --map-neutral-top: #3d3d3a;
+    --map-neutral-bottom: #2e2e2c;
+    --map-agree-top: #4dff91;
+    --map-agree-bottom: #12b85a;
+    --map-disagree-top: #ff5c7a;
+    --map-disagree-bottom: #e8193f;
+    --map-agree-glow: #39ff88;
+    --map-disagree-glow: #ff3b5c;
+    --map-stroke: rgba(255, 255, 255, 0.08);
+    --map-stroke-hover: rgba(255, 255, 255, 0.22);
+    --map-plate: rgba(255, 255, 255, 0.03);
+  }
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+}
+
+/* ── Korea geographic SVG map ── */
+.korea-geo-map-frame {
+  border-radius: 24px;
+  padding: 0.35rem;
+  background: linear-gradient(
+    165deg,
+    rgba(186, 230, 253, 0.45),
+    rgba(224, 242, 254, 0.2)
+  );
+}
+
+.korea-geo-map-svg {
+  display: block;
+  animation: korea-geo-map-enter 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes korea-geo-map-enter {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.korea-geo-map-sea {
+  fill: rgba(186, 230, 253, 0.35);
+}
+
+.korea-geo-path {
+  cursor: pointer;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  transition:
+    fill 0.35s ease,
+    stroke 0.25s ease,
+    stroke-width 0.25s ease,
+    transform 0.22s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.25s ease;
+  animation: korea-geo-path-enter 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+@keyframes korea-geo-path-enter {
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.korea-geo-path--empty {
+  fill: #fafafa;
+  stroke: #d4d4d8;
+  stroke-width: 0.9;
+}
+
+.korea-geo-path--tie {
+  fill: #f59e0b;
+  stroke: #fbbf24;
+  stroke-width: 1;
+}
+
+.korea-geo-path--agree {
+  fill: #22ff88;
+  stroke: #10b981;
+  stroke-width: 1;
+}
+
+.korea-geo-path--disagree {
+  fill: #ff3b5c;
+  stroke: #e11d48;
+  stroke-width: 1;
+}
+
+.korea-geo-path--hover {
+  transform: scale(1.03);
+  stroke-width: 1.4;
+}
+
+.korea-geo-path--selected {
+  transform: scale(1.05);
+  stroke: rgba(255, 255, 255, 0.55);
+  stroke-width: 2.5;
+}
+
+.korea-geo-label {
+  font-weight: 700;
+  paint-order: stroke fill;
+  pointer-events: none;
+  user-select: none;
+}
+
+.korea-geo-label--neutral {
+  fill: #52525b;
+  stroke: #fafafa;
+  stroke-width: 2.5px;
+}
+
+.korea-geo-label--active {
+  fill: #ffffff;
+  stroke: rgba(15, 23, 42, 0.55);
+  stroke-width: 2px;
+}
+
+.korea-geo-legend {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 9999px;
+}
+
+.korea-geo-legend--agree {
+  background: #22ff88;
+  box-shadow: 0 0 8px rgba(34, 255, 136, 0.65);
+}
+
+.korea-geo-legend--disagree {
+  background: #ff3b5c;
+  box-shadow: 0 0 8px rgba(255, 59, 92, 0.65);
+}
+
+.korea-geo-legend--tie {
+  background: #f59e0b;
+  box-shadow: 0 0 8px rgba(245, 158, 11, 0.65);
+}
+
+.korea-geo-legend--empty {
+  background: #fafafa;
+  box-shadow: inset 0 0 0 1px #d4d4d8;
+}
+
+.korea-map-detail {
+  animation: korea-map-detail-enter 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes korea-map-detail-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.korea-map-detail--agree {
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.28),
+    0 0 0 1px rgba(16, 185, 129, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.korea-map-detail--disagree {
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.28),
+    0 0 0 1px rgba(244, 63, 94, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.korea-map-detail--tie {
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.28),
+    0 0 0 1px rgba(245, 158, 11, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
