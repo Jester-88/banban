@@ -48,7 +48,7 @@ export async function POST(request: Request) {
     )
   }
 
-  let body: { title?: string; tag?: string; endsAt?: string }
+  let body: { title?: string; tag?: string; endsAt?: string; ends_at?: string }
 
   try {
     body = await request.json()
@@ -68,7 +68,7 @@ export async function POST(request: Request) {
   }
 
   const tag = body.tag?.trim() || DEFAULT_POLL_TAG
-  const endsAt = body.endsAt?.trim()
+  const endsAt = (body.endsAt ?? body.ends_at)?.trim()
   if (!endsAt) {
     return NextResponse.json(
       { error: "INVALID_ENDS_AT", message: "마감일을 선택해 주세요." },

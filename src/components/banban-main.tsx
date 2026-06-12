@@ -431,41 +431,41 @@ export function BanbanMain() {
                     </p>
                   ) : null}
                   <div className="grid grid-cols-2 gap-3">
-                  <button
-                    type="button"
-                    onClick={() => openRegionModal("agree")}
-                    disabled={voteDisabled}
-                    aria-pressed={vote === "agree"}
-                    className={`group flex h-28 flex-col items-center justify-center gap-2 rounded-3xl border-2 transition-all active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-60 ${
-                      vote === "agree"
-                        ? "border-transparent bg-[var(--agree)] text-[var(--agree-foreground)] shadow-lg shadow-[var(--agree)]/30"
-                        : "border-border bg-card text-foreground hover:border-[var(--agree)]"
-                    }`}
-                  >
-                    <Check
-                      className={`size-8 ${vote === "agree" ? "" : "text-[var(--agree)]"}`}
-                      strokeWidth={2.5}
-                    />
-                    <span className="text-lg font-extrabold">찬성</span>
-                  </button>
+                    <button
+                      type="button"
+                      onClick={() => openRegionModal("agree")}
+                      disabled={voteDisabled}
+                      aria-pressed={vote === "agree"}
+                      className={`group flex h-28 flex-col items-center justify-center gap-2 rounded-3xl border-2 transition-all active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-60 ${
+                        vote === "agree"
+                          ? "border-transparent bg-[var(--agree)] text-[var(--agree-foreground)] shadow-lg shadow-[var(--agree)]/30"
+                          : "border-border bg-card text-foreground hover:border-[var(--agree)]"
+                      }`}
+                    >
+                      <Check
+                        className={`size-8 ${vote === "agree" ? "" : "text-[var(--agree)]"}`}
+                        strokeWidth={2.5}
+                      />
+                      <span className="text-lg font-extrabold">찬성</span>
+                    </button>
 
-                  <button
-                    type="button"
-                    onClick={() => openRegionModal("disagree")}
-                    disabled={voteDisabled}
-                    aria-pressed={vote === "disagree"}
-                    className={`group flex h-28 flex-col items-center justify-center gap-2 rounded-3xl border-2 transition-all active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-60 ${
-                      vote === "disagree"
-                        ? "border-transparent bg-[var(--disagree)] text-[var(--disagree-foreground)] shadow-lg shadow-[var(--disagree)]/30"
-                        : "border-border bg-card text-foreground hover:border-[var(--disagree)]"
-                    }`}
-                  >
-                    <X
-                      className={`size-8 ${vote === "disagree" ? "" : "text-[var(--disagree)]"}`}
-                      strokeWidth={2.5}
-                    />
-                    <span className="text-lg font-extrabold">반대</span>
-                  </button>
+                    <button
+                      type="button"
+                      onClick={() => openRegionModal("disagree")}
+                      disabled={voteDisabled}
+                      aria-pressed={vote === "disagree"}
+                      className={`group flex h-28 flex-col items-center justify-center gap-2 rounded-3xl border-2 transition-all active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-60 ${
+                        vote === "disagree"
+                          ? "border-transparent bg-[var(--disagree)] text-[var(--disagree-foreground)] shadow-lg shadow-[var(--disagree)]/30"
+                          : "border-border bg-card text-foreground hover:border-[var(--disagree)]"
+                      }`}
+                    >
+                      <X
+                        className={`size-8 ${vote === "disagree" ? "" : "text-[var(--disagree)]"}`}
+                        strokeWidth={2.5}
+                      />
+                      <span className="text-lg font-extrabold">반대</span>
+                    </button>
                   </div>
                 </section>
               )}

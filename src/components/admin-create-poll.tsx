@@ -3,11 +3,7 @@
 import { useState } from "react"
 import { Plus } from "lucide-react"
 import { DEFAULT_POLL_TAG } from "@/lib/banban-data"
-import {
-  dateInputToEndsAt,
-  defaultPollEndDateInput,
-  minPollEndDateInput,
-} from "@/lib/poll-deadline"
+import { defaultPollEndDateInput, minPollEndDateInput } from "@/lib/poll-deadline"
 import { createPoll } from "@/lib/polls"
 import type { Poll } from "@/lib/polls"
 
@@ -50,7 +46,7 @@ export function AdminCreatePoll({ onCreated }: AdminCreatePollProps) {
       const poll = await createPoll({
         title: trimmed,
         tag: tag.trim() || DEFAULT_POLL_TAG,
-        endsAt: dateInputToEndsAt(endsAtDate),
+        endsAt: endsAtDate,
       })
       setTitle("")
       setTag(DEFAULT_POLL_TAG)
