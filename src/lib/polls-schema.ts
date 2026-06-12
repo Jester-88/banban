@@ -6,4 +6,5 @@ export const POLL_COLUMNS = {
   title: "title",
   tag: "tag",
   createdAt: "created_at",
+  endsAt: "ends_at",
 } as const

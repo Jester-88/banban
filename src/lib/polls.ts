@@ -8,6 +8,7 @@ export type Poll = {
   title: string
   tag: string
   createdAt: string
+  endsAt: string | null
 }
 
 type PollRow = {
@@ -16,6 +17,7 @@ type PollRow = {
   title: string
   tag: string | null
   created_at: string
+  ends_at: string | null
 }
 
 function toPoll(row: PollRow): Poll {
@@ -25,6 +27,7 @@ function toPoll(row: PollRow): Poll {
     title: row.title,
     tag: row.tag?.trim() || DEFAULT_POLL_TAG,
     createdAt: row.created_at,
+    endsAt: row.ends_at,
   }
 }
 
@@ -33,7 +36,7 @@ export async function fetchPolls(): Promise<Poll[]> {
   const { data, error } = await supabase
     .from(POLLS_TABLE)
     .select(
-      `${POLL_COLUMNS.id}, ${POLL_COLUMNS.slug}, ${POLL_COLUMNS.title}, ${POLL_COLUMNS.tag}, ${POLL_COLUMNS.createdAt}`,
+      `${POLL_COLUMNS.id}, ${POLL_COLUMNS.slug}, ${POLL_COLUMNS.title}, ${POLL_COLUMNS.tag}, ${POLL_COLUMNS.createdAt}, ${POLL_COLUMNS.endsAt}`,
     )
     .order(POLL_COLUMNS.createdAt, { ascending: false })
 
@@ -48,6 +51,7 @@ export async function fetchPolls(): Promise<Poll[]> {
 export async function createPoll(input: {
   title: string
   tag?: string
+  endsAt: string
 }): Promise<Poll> {
   const response = await fetch("/api/polls", {
     method: "POST",

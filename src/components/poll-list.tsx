@@ -2,6 +2,7 @@
 
 import { useMemo } from "react"
 import { Search, X } from "lucide-react"
+import { PollDeadlineBadge } from "@/components/poll-deadline-badge"
 import type { Poll } from "@/lib/polls"
 
 type PollListProps = {
@@ -103,9 +104,12 @@ export function PollList({
                     : "border-border bg-card/60 hover:border-foreground/15 hover:bg-card"
                 }`}
               >
-                <span className="mb-1 block text-[10px] font-bold tracking-wide text-muted-foreground">
-                  {poll.tag}
-                </span>
+                <div className="mb-1 flex flex-wrap items-center gap-1.5">
+                  <span className="text-[10px] font-bold tracking-wide text-muted-foreground">
+                    {poll.tag}
+                  </span>
+                  <PollDeadlineBadge endsAt={poll.endsAt} />
+                </div>
                 <span className="line-clamp-2 text-sm font-bold leading-snug text-foreground">
                   {poll.title}
                 </span>

@@ -3,6 +3,11 @@
 import { useState } from "react"
 import { Plus } from "lucide-react"
 import { DEFAULT_POLL_TAG } from "@/lib/banban-data"
+import {
+  dateInputToEndsAt,
+  defaultPollEndDateInput,
+  minPollEndDateInput,
+} from "@/lib/poll-deadline"
 import { createPoll } from "@/lib/polls"
 import type { Poll } from "@/lib/polls"
 
@@ -14,6 +19,7 @@ export function AdminCreatePoll({ onCreated }: AdminCreatePollProps) {
   const [open, setOpen] = useState(false)
   const [title, setTitle] = useState("")
   const [tag, setTag] = useState(DEFAULT_POLL_TAG)
+  const [endsAtDate, setEndsAtDate] = useState(defaultPollEndDateInput)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -27,6 +33,16 @@ export function AdminCreatePoll({ onCreated }: AdminCreatePollProps) {
       return
     }
 
+    if (!endsAtDate) {
+      setError("마감일을 선택해 주세요.")
+      return
+    }
+
+    if (endsAtDate < minPollEndDateInput()) {
+      setError("마감일은 오늘 이후로 설정해 주세요.")
+      return
+    }
+
     setBusy(true)
     setError(null)
 
@@ -34,9 +50,11 @@ export function AdminCreatePoll({ onCreated }: AdminCreatePollProps) {
       const poll = await createPoll({
         title: trimmed,
         tag: tag.trim() || DEFAULT_POLL_TAG,
+        endsAt: dateInputToEndsAt(endsAtDate),
       })
       setTitle("")
       setTag(DEFAULT_POLL_TAG)
+      setEndsAtDate(defaultPollEndDateInput())
       setOpen(false)
       onCreated(poll)
     } catch (e) {
@@ -85,7 +103,7 @@ export function AdminCreatePoll({ onCreated }: AdminCreatePollProps) {
         />
       </label>
 
-      <label className="mb-4 block">
+      <label className="mb-3 block">
         <span className="mb-1.5 block text-xs font-semibold text-muted-foreground">
           태그 (선택)
         </span>
@@ -97,6 +115,24 @@ export function AdminCreatePoll({ onCreated }: AdminCreatePollProps) {
           className="w-full rounded-xl border border-border bg-card px-3 py-2.5 text-sm text-foreground outline-none ring-emerald-500/30 focus:ring-2"
           disabled={busy}
         />
+      </label>
+
+      <label className="mb-4 block">
+        <span className="mb-1.5 block text-xs font-semibold text-muted-foreground">
+          마감일
+        </span>
+        <input
+          type="date"
+          value={endsAtDate}
+          onChange={(e) => setEndsAtDate(e.target.value)}
+          min={minPollEndDateInput()}
+          className="w-full rounded-xl border border-border bg-card px-3 py-2.5 text-sm text-foreground outline-none ring-emerald-500/30 focus:ring-2 [color-scheme:dark]"
+          disabled={busy}
+          required
+        />
+        <span className="mt-1.5 block text-[11px] text-muted-foreground">
+          선택한 날짜 23:59(KST)까지 투표할 수 있습니다.
+        </span>
       </label>
 
       {error ? (

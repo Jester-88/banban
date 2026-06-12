@@ -5,6 +5,7 @@ import { Check, X, Camera, Share2 } from "lucide-react"
 import { AdminCreatePoll } from "@/components/admin-create-poll"
 import { KoreaMap } from "@/components/korea-map"
 import { LoginModal } from "@/components/login-modal"
+import { PollDeadlineBadge } from "@/components/poll-deadline-badge"
 import { PollList } from "@/components/poll-list"
 import { RegionSelectModal } from "@/components/region-select-modal"
 import { UserProfileBadge } from "@/components/user-profile-badge"
@@ -12,6 +13,7 @@ import { VoteCompletedPanel } from "@/components/vote-completed-panel"
 import { isAdminUser } from "@/lib/admin"
 import type { RegionId } from "@/lib/banban-data"
 import { useAuth } from "@/hooks/use-auth"
+import { getPollDeadlineStatus } from "@/lib/poll-deadline"
 import { deletePoll, fetchPolls, type Poll } from "@/lib/polls"
 import {
   buildEmptyRegionStats,
@@ -173,8 +175,14 @@ export function BanbanMain() {
     }
   }
 
+  const pollDeadline = useMemo(
+    () => getPollDeadlineStatus(selectedPoll?.endsAt),
+    [selectedPoll?.endsAt],
+  )
+
   function openRegionModal(choice: VoteChoice) {
-    if (!selectedSlug || busy === "vote" || hasVoted) return
+    if (!selectedSlug || busy === "vote" || hasVoted || pollDeadline.isExpired)
+      return
 
     if (!user) {
       setLoginOpen(true)
@@ -200,7 +208,8 @@ export function BanbanMain() {
       !pendingChoice ||
       !selectedRegion ||
       busy === "vote" ||
-      hasVoted
+      hasVoted ||
+      pollDeadline.isExpired
     ) {
       return
     }
@@ -312,7 +321,11 @@ export function BanbanMain() {
 
   const showVoteCompleted = !!user && hasVoted && existingVote !== null
   const voteDisabled =
-    !selectedSlug || busy === "vote" || showVoteCompleted || totalsLoading
+    !selectedSlug ||
+    busy === "vote" ||
+    showVoteCompleted ||
+    totalsLoading ||
+    pollDeadline.isExpired
 
   return (
     <>
@@ -412,9 +425,12 @@ export function BanbanMain() {
           {selectedPoll ? (
             <>
               <section className="mt-7">
-                <span className="inline-flex items-center rounded-full bg-secondary px-3 py-1 text-[11px] font-bold tracking-wide text-foreground">
-                  {selectedPoll.tag}
-                </span>
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="inline-flex items-center rounded-full bg-secondary px-3 py-1 text-[11px] font-bold tracking-wide text-foreground">
+                    {selectedPoll.tag}
+                  </span>
+                  <PollDeadlineBadge endsAt={selectedPoll.endsAt} />
+                </div>
                 <h2 className="mt-3 text-pretty text-[26px] font-extrabold leading-snug tracking-tight text-foreground">
                   {selectedPoll.title}
                 </h2>
@@ -427,7 +443,13 @@ export function BanbanMain() {
                   loading={totalsLoading}
                 />
               ) : (
-                <section className="mt-6 grid grid-cols-2 gap-3">
+                <section className="mt-6">
+                  {pollDeadline.isExpired ? (
+                    <p className="mb-3 rounded-2xl border border-border bg-card/60 px-4 py-3 text-center text-sm font-semibold text-muted-foreground">
+                      마감된 투표입니다
+                    </p>
+                  ) : null}
+                  <div className="grid grid-cols-2 gap-3">
                   <button
                     type="button"
                     onClick={() => openRegionModal("agree")}
@@ -463,6 +485,7 @@ export function BanbanMain() {
                     />
                     <span className="text-lg font-extrabold">반대</span>
                   </button>
+                  </div>
                 </section>
               )}
 

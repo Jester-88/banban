@@ -6,7 +6,8 @@ create table if not exists public.polls (
   slug text not null unique,
   title text not null,
   tag text default '오늘의 반반',
-  created_at timestamptz not null default now()
+  created_at timestamptz not null default now(),
+  ends_at timestamptz
 );
 
 create index if not exists polls_created_at_idx on public.polls (created_at desc);

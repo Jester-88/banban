@@ -48,7 +48,7 @@ export async function POST(request: Request) {
     )
   }
 
-  let body: { title?: string; tag?: string }
+  let body: { title?: string; tag?: string; endsAt?: string }
 
   try {
     body = await request.json()
@@ -68,6 +68,22 @@ export async function POST(request: Request) {
   }
 
   const tag = body.tag?.trim() || DEFAULT_POLL_TAG
+  const endsAt = body.endsAt?.trim()
+  if (!endsAt) {
+    return NextResponse.json(
+      { error: "INVALID_ENDS_AT", message: "마감일을 선택해 주세요." },
+      { status: 400 },
+    )
+  }
+
+  const parsedEndsAt = new Date(endsAt)
+  if (Number.isNaN(parsedEndsAt.getTime())) {
+    return NextResponse.json(
+      { error: "INVALID_ENDS_AT", message: "마감일 형식이 올바르지 않습니다." },
+      { status: 400 },
+    )
+  }
+
   const baseSlug = generateSlugFromTitle(title)
 
   let admin
@@ -95,9 +111,10 @@ export async function POST(request: Request) {
         [POLL_COLUMNS.slug]: slug,
         [POLL_COLUMNS.title]: title,
         [POLL_COLUMNS.tag]: tag,
+        [POLL_COLUMNS.endsAt]: endsAt,
       })
       .select(
-        `${POLL_COLUMNS.id}, ${POLL_COLUMNS.slug}, ${POLL_COLUMNS.title}, ${POLL_COLUMNS.tag}, ${POLL_COLUMNS.createdAt}`,
+        `${POLL_COLUMNS.id}, ${POLL_COLUMNS.slug}, ${POLL_COLUMNS.title}, ${POLL_COLUMNS.tag}, ${POLL_COLUMNS.createdAt}, ${POLL_COLUMNS.endsAt}`,
       )
       .single()
 
