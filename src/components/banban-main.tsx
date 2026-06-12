@@ -39,6 +39,7 @@ export function BanbanMain() {
   const [pollsLoading, setPollsLoading] = useState(true)
   const [pollsError, setPollsError] = useState<string | null>(null)
   const [selectedSlug, setSelectedSlug] = useState<string | null>(null)
+  const [pollSearchQuery, setPollSearchQuery] = useState("")
 
   const {
     user,
@@ -378,6 +379,8 @@ export function BanbanMain() {
             polls={polls}
             selectedSlug={selectedSlug}
             onSelect={setSelectedSlug}
+            searchQuery={pollSearchQuery}
+            onSearchChange={setPollSearchQuery}
             loading={pollsLoading}
           />
 
