@@ -84,6 +84,17 @@ export async function POST(request: Request) {
     )
   }
 
+  if (parsedEndsAt.getTime() <= Date.now()) {
+    return NextResponse.json(
+      {
+        error: "INVALID_ENDS_AT",
+        message: "마감일은 현재 시각 이후로 설정해 주세요.",
+      },
+      { status: 400 },
+    )
+  }
+
+  const endsAtIso = parsedEndsAt.toISOString()
   const baseSlug = generateSlugFromTitle(title)
 
   let admin
@@ -111,7 +122,7 @@ export async function POST(request: Request) {
         [POLL_COLUMNS.slug]: slug,
         [POLL_COLUMNS.title]: title,
         [POLL_COLUMNS.tag]: tag,
-        [POLL_COLUMNS.endsAt]: endsAt,
+        [POLL_COLUMNS.endsAt]: endsAtIso,
       })
       .select(
         `${POLL_COLUMNS.id}, ${POLL_COLUMNS.slug}, ${POLL_COLUMNS.title}, ${POLL_COLUMNS.tag}, ${POLL_COLUMNS.createdAt}, ${POLL_COLUMNS.endsAt}`,

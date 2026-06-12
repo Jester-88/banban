@@ -39,7 +39,7 @@ export function AdminCreatePoll({ onCreated }: AdminCreatePollProps) {
     }
 
     if (endsAtDate < minPollEndDateInput()) {
-      setError("마감일은 오늘 이후로 설정해 주세요.")
+      setError("마감일은 오늘 이전 날짜로 설정할 수 없습니다.")
       return
     }
 
