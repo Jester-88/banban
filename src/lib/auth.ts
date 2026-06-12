@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/client"
 
 function getRedirectUrl() {
-  return `${window.location.origin}/auth/callback`
+  return "https://banban-d9aa.vercel.app/"
 }
 
 /** 닉네임·프로필 사진만 요청 (이메일 scope 제외) */

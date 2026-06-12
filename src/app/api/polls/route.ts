@@ -124,3 +124,77 @@ export async function POST(request: Request) {
 
   return NextResponse.json({ poll: inserted }, { status: 201 })
 }
+
+export async function DELETE(request: Request) {
+  const supabase = await createSessionSupabase()
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser()
+
+  if (authError || !user) {
+    return NextResponse.json(
+      { error: "NOT_AUTHENTICATED", message: "로그인이 필요합니다." },
+      { status: 401 },
+    )
+  }
+
+  if (!isAdminUser(user.id)) {
+    return NextResponse.json(
+      { error: "FORBIDDEN", message: "관리자만 투표 주제를 삭제할 수 있습니다." },
+      { status: 403 },
+    )
+  }
+
+  let body: { id?: string }
+
+  try {
+    body = await request.json()
+  } catch {
+    return NextResponse.json(
+      { error: "INVALID_BODY", message: "잘못된 요청입니다." },
+      { status: 400 },
+    )
+  }
+
+  const id = body.id?.trim()
+  if (!id) {
+    return NextResponse.json(
+      { error: "INVALID_ID", message: "삭제할 투표 ID가 필요합니다." },
+      { status: 400 },
+    )
+  }
+
+  let admin
+  try {
+    admin = createAdminClient()
+  } catch (e) {
+    console.error("[banban] admin client error:", e)
+    return NextResponse.json(
+      {
+        error: "SERVER_CONFIG",
+        message: "서버 설정(SUPABASE_SERVICE_ROLE_KEY)이 필요합니다.",
+      },
+      { status: 500 },
+    )
+  }
+
+  const { error } = await admin
+    .from(POLLS_TABLE)
+    .delete()
+    .eq(POLL_COLUMNS.id, id)
+
+  if (error) {
+    console.error("[banban] poll delete error:", error)
+    return NextResponse.json(
+      {
+        error: "DELETE_FAILED",
+        message: error.message ?? "투표 주제 삭제에 실패했습니다.",
+        code: error.code ?? null,
+      },
+      { status: 500 },
+    )
+  }
+
+  return NextResponse.json({ success: true })
+}

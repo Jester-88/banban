@@ -12,7 +12,7 @@ import { VoteCompletedPanel } from "@/components/vote-completed-panel"
 import { isAdminUser } from "@/lib/admin"
 import type { RegionId } from "@/lib/banban-data"
 import { useAuth } from "@/hooks/use-auth"
-import { fetchPolls, type Poll } from "@/lib/polls"
+import { deletePoll, fetchPolls, type Poll } from "@/lib/polls"
 import {
   buildEmptyRegionStats,
   fetchVoteStats,
@@ -63,6 +63,7 @@ export function BanbanMain() {
   const [pendingChoice, setPendingChoice] = useState<VoteChoice | null>(null)
   const [selectedRegion, setSelectedRegion] = useState<RegionId | null>(null)
   const [logoutBusy, setLogoutBusy] = useState(false)
+  const [deleteBusy, setDeleteBusy] = useState(false)
   const captureRef = useRef<HTMLDivElement>(null)
 
   const selectedPoll = useMemo(
@@ -153,6 +154,22 @@ export function BanbanMain() {
   function handlePollCreated(poll: Poll) {
     setPolls((prev) => [poll, ...prev])
     setSelectedSlug(poll.slug)
+  }
+
+  async function handleDeletePoll() {
+    if (!selectedPoll || deleteBusy) return
+
+    setDeleteBusy(true)
+    try {
+      await deletePoll(selectedPoll.id)
+      alert("투표 주제가 삭제되었습니다.")
+      window.location.reload()
+    } catch (e) {
+      alert(
+        e instanceof Error ? e.message : "투표 주제 삭제에 실패했습니다.",
+      )
+      setDeleteBusy(false)
+    }
   }
 
   function openRegionModal(choice: VoteChoice) {
@@ -364,9 +381,28 @@ export function BanbanMain() {
             loading={pollsLoading}
           />
 
-          {isAdmin ? (
-            <AdminCreatePoll onCreated={handlePollCreated} />
-          ) : null}
+          <div className="space-y-2 rounded-2xl border border-border bg-card/40 p-3">
+            <p className="px-1 text-[11px] font-bold tracking-wide text-muted-foreground">
+              주제 관리
+            </p>
+
+            <button
+              type="button"
+              onClick={() => void handleDeletePoll()}
+              disabled={deleteBusy || !selectedPoll}
+              className="w-full rounded-xl border-2 border-rose-500 bg-rose-500/20 px-4 py-3 text-sm font-bold text-rose-300 transition-colors hover:bg-rose-500/30 disabled:cursor-not-allowed disabled:border-rose-500/30 disabled:bg-rose-500/5 disabled:text-rose-500/40"
+            >
+              {deleteBusy
+                ? "삭제 중..."
+                : selectedPoll
+                  ? `투표 삭제 · ${selectedPoll.title}`
+                  : "투표 삭제 (주제를 먼저 선택하세요)"}
+            </button>
+
+            {isAdmin ? (
+              <AdminCreatePoll onCreated={handlePollCreated} />
+            ) : null}
+          </div>
         </section>
 
         <div ref={captureRef} className="rounded-3xl">

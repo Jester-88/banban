@@ -72,3 +72,21 @@ export async function createPoll(input: {
 
   return toPoll(body.poll)
 }
+
+export async function deletePoll(id: string): Promise<void> {
+  const response = await fetch("/api/polls", {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify({ id }),
+  })
+
+  const body = (await response.json()) as {
+    error?: string
+    message?: string
+  }
+
+  if (!response.ok) {
+    throw new Error(body.message ?? body.error ?? "투표 주제 삭제에 실패했습니다.")
+  }
+}
