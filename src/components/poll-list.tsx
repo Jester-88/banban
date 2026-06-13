@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo, type ReactNode } from "react"
+import { useMemo } from "react"
 import { Search, X } from "lucide-react"
 import { AdminCreatePoll } from "@/components/admin-create-poll"
 import { PollDeadlineBadge } from "@/components/poll-deadline-badge"
@@ -30,12 +30,6 @@ function matchesSearch(poll: Poll, query: string) {
   )
 }
 
-function PollListScrollArea({ children }: { children: ReactNode }) {
-  return (
-    <div className="poll-list-scroll max-h-[640px] pr-0.5">{children}</div>
-  )
-}
-
 function PollCards({
   polls,
   selectedSlug,
@@ -48,9 +42,9 @@ function PollCards({
   trimmedQuery: string
 }) {
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-4 max-h-[600px] overflow-y-auto pr-2">
       {trimmedQuery ? (
-        <p className="sticky top-0 z-10 bg-background/90 px-1 py-1 text-[11px] text-muted-foreground backdrop-blur-sm">
+        <p className="px-1 text-[11px] text-muted-foreground">
           {polls.length}개 주제 표시 중
         </p>
       ) : null}
@@ -175,14 +169,12 @@ export function PollList({
           </button>
         </div>
       ) : (
-        <PollListScrollArea>
-          <PollCards
-            polls={filteredPolls}
-            selectedSlug={selectedSlug}
-            onSelect={onSelect}
-            trimmedQuery={trimmedQuery}
-          />
-        </PollListScrollArea>
+        <PollCards
+          polls={filteredPolls}
+          selectedSlug={selectedSlug}
+          onSelect={onSelect}
+          trimmedQuery={trimmedQuery}
+        />
       )}
 
       {adminPanel}
