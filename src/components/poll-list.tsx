@@ -32,7 +32,7 @@ function matchesSearch(poll: Poll, query: string) {
 
 function PollListBox({ children }: { children: ReactNode }) {
   return (
-    <div className="h-[600px] overflow-y-auto border-2 border-red-500 rounded-xl p-4 flex flex-col gap-4">
+    <div className="h-[600px] min-h-0 overflow-y-auto border-4 border-blue-500 rounded-xl p-4 flex flex-col gap-4">
       {children}
     </div>
   )
@@ -50,7 +50,7 @@ function PollCards({
   trimmedQuery: string
 }) {
   return (
-    <>
+    <div className="h-[600px] min-h-0 overflow-y-auto border-4 border-blue-500 rounded-xl p-4 flex flex-col gap-4">
       {trimmedQuery ? (
         <p className="shrink-0 px-1 text-[11px] text-muted-foreground">
           {polls.length}개 주제 표시 중
@@ -81,7 +81,7 @@ function PollCards({
           </button>
         )
       })}
-    </>
+    </div>
   )
 }
 
@@ -169,8 +169,8 @@ export function PollList({
     <div className="min-h-0 space-y-3">
       <PollSearchInput value={searchQuery} onChange={onSearchChange} />
 
-      <PollListBox>
-        {filteredPolls.length === 0 ? (
+      {filteredPolls.length === 0 ? (
+        <PollListBox>
           <div className="text-center text-sm text-muted-foreground">
             <p>&quot;{trimmedQuery}&quot;에 맞는 주제가 없습니다.</p>
             <button
@@ -181,15 +181,15 @@ export function PollList({
               검색어 지우기
             </button>
           </div>
-        ) : (
-          <PollCards
-            polls={filteredPolls}
-            selectedSlug={selectedSlug}
-            onSelect={onSelect}
-            trimmedQuery={trimmedQuery}
-          />
-        )}
-      </PollListBox>
+        </PollListBox>
+      ) : (
+        <PollCards
+          polls={filteredPolls}
+          selectedSlug={selectedSlug}
+          onSelect={onSelect}
+          trimmedQuery={trimmedQuery}
+        />
+      )}
 
       {adminPanel}
     </div>
