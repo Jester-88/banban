@@ -42,14 +42,13 @@ function PollCards({
   trimmedQuery: string
 }) {
   return (
-    <div className="min-h-0 w-full">
-      <div className="flex h-[550px] min-h-0 flex-col gap-4 overflow-y-auto pr-2">
-        {trimmedQuery ? (
-          <p className="px-1 text-[11px] text-muted-foreground">
-            {polls.length}개 주제 표시 중
-          </p>
-        ) : null}
-        {polls.map((poll) => {
+    <div className="h-[550px] min-h-0 overflow-y-auto pr-2 flex flex-col gap-4 poll-list-scroll">
+      {trimmedQuery ? (
+        <p className="px-1 text-[11px] text-muted-foreground">
+          {polls.length}개 주제 표시 중
+        </p>
+      ) : null}
+      {polls.map((poll) => {
         const selected = poll.slug === selectedSlug
         return (
           <button
@@ -74,7 +73,6 @@ function PollCards({
           </button>
         )
       })}
-      </div>
     </div>
   )
 }
