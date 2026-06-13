@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo } from "react"
+import { useMemo, type ReactNode } from "react"
 import { Search, X } from "lucide-react"
 import { AdminCreatePoll } from "@/components/admin-create-poll"
 import { PollDeadlineBadge } from "@/components/poll-deadline-badge"
@@ -30,6 +30,14 @@ function matchesSearch(poll: Poll, query: string) {
   )
 }
 
+function PollListBox({ children }: { children: ReactNode }) {
+  return (
+    <div className="h-[600px] overflow-y-auto border-2 border-red-500 rounded-xl p-4 flex flex-col gap-4">
+      {children}
+    </div>
+  )
+}
+
 function PollCards({
   polls,
   selectedSlug,
@@ -42,9 +50,9 @@ function PollCards({
   trimmedQuery: string
 }) {
   return (
-    <div className="h-[550px] min-h-0 overflow-y-auto pr-2 flex flex-col gap-4 poll-list-scroll">
+    <>
       {trimmedQuery ? (
-        <p className="px-1 text-[11px] text-muted-foreground">
+        <p className="shrink-0 px-1 text-[11px] text-muted-foreground">
           {polls.length}개 주제 표시 중
         </p>
       ) : null}
@@ -55,7 +63,7 @@ function PollCards({
             key={poll.id}
             type="button"
             onClick={() => onSelect(poll.slug)}
-            className={`rounded-2xl border px-4 py-3 text-left transition-all active:scale-[0.99] ${
+            className={`shrink-0 rounded-2xl border px-4 py-3 text-left transition-all active:scale-[0.99] ${
               selected
                 ? "border-foreground/25 bg-secondary shadow-sm ring-2 ring-foreground/10"
                 : "border-border bg-card/60 hover:border-foreground/15 hover:bg-card"
@@ -73,7 +81,7 @@ function PollCards({
           </button>
         )
       })}
-    </div>
+    </>
   )
 }
 
@@ -123,15 +131,17 @@ export function PollList({
 
   if (loading) {
     return (
-      <div className="space-y-3">
+      <div className="min-h-0 space-y-3">
         <PollSearchInput
           value={searchQuery}
           onChange={onSearchChange}
           disabled
         />
-        <div className="rounded-2xl border border-border bg-card/50 px-4 py-6 text-center text-sm text-muted-foreground">
-          투표 목록을 불러오는 중...
-        </div>
+        <PollListBox>
+          <p className="text-center text-sm text-muted-foreground">
+            투표 목록을 불러오는 중...
+          </p>
+        </PollListBox>
         {adminPanel}
       </div>
     )
@@ -139,43 +149,47 @@ export function PollList({
 
   if (polls.length === 0) {
     return (
-      <div className="space-y-3">
+      <div className="min-h-0 space-y-3">
         <PollSearchInput
           value={searchQuery}
           onChange={onSearchChange}
           disabled
         />
-        <div className="rounded-2xl border border-dashed border-border bg-card/40 px-4 py-6 text-center text-sm text-muted-foreground">
-          등록된 투표 주제가 없습니다.
-        </div>
+        <PollListBox>
+          <p className="text-center text-sm text-muted-foreground">
+            등록된 투표 주제가 없습니다.
+          </p>
+        </PollListBox>
         {adminPanel}
       </div>
     )
   }
 
   return (
-    <div className="space-y-3">
+    <div className="min-h-0 space-y-3">
       <PollSearchInput value={searchQuery} onChange={onSearchChange} />
 
-      {filteredPolls.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-border bg-card/40 px-4 py-6 text-center text-sm text-muted-foreground">
-          <p>&quot;{trimmedQuery}&quot;에 맞는 주제가 없습니다.</p>
-          <button
-            type="button"
-            onClick={() => onSearchChange("")}
-            className="mt-2 text-xs font-semibold text-foreground/80 underline-offset-2 hover:underline"
-          >
-            검색어 지우기
-          </button>
-        </div>
-      ) : (
-        <PollCards
-          polls={filteredPolls}
-          selectedSlug={selectedSlug}
-          onSelect={onSelect}
-          trimmedQuery={trimmedQuery}
-        />
-      )}
+      <PollListBox>
+        {filteredPolls.length === 0 ? (
+          <div className="text-center text-sm text-muted-foreground">
+            <p>&quot;{trimmedQuery}&quot;에 맞는 주제가 없습니다.</p>
+            <button
+              type="button"
+              onClick={() => onSearchChange("")}
+              className="mt-2 text-xs font-semibold text-foreground/80 underline-offset-2 hover:underline"
+            >
+              검색어 지우기
+            </button>
+          </div>
+        ) : (
+          <PollCards
+            polls={filteredPolls}
+            selectedSlug={selectedSlug}
+            onSelect={onSelect}
+            trimmedQuery={trimmedQuery}
+          />
+        )}
+      </PollListBox>
 
       {adminPanel}
     </div>

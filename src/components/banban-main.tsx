@@ -375,7 +375,7 @@ export function BanbanMain() {
           </div>
         </header>
 
-        <section className="mt-5 space-y-3">
+        <section className="mt-5 min-h-0 shrink-0 space-y-3">
           <div className="flex items-center justify-between px-1">
             <p className="text-sm font-bold text-foreground">투표 주제</p>
             <p className="text-[11px] text-muted-foreground">주제를 선택하세요</p>
