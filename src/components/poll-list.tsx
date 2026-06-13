@@ -30,12 +30,11 @@ function matchesSearch(poll: Poll, query: string) {
   )
 }
 
+const POLL_LIST_SCROLL_CLASS =
+  "max-h-[350px] overflow-y-auto pr-2 flex flex-col gap-3"
+
 function PollListBox({ children }: { children: ReactNode }) {
-  return (
-    <div className="h-[600px] min-h-0 overflow-y-auto border-4 border-blue-500 rounded-xl p-4 flex flex-col gap-4">
-      {children}
-    </div>
-  )
+  return <div className={POLL_LIST_SCROLL_CLASS}>{children}</div>
 }
 
 function PollCards({
@@ -50,7 +49,7 @@ function PollCards({
   trimmedQuery: string
 }) {
   return (
-    <div style={{ height: "300px", overflowY: "auto" }} className="flex flex-col gap-3 pr-2">
+    <div className="max-h-[350px] overflow-y-auto pr-2 flex flex-col gap-3">
       {trimmedQuery ? (
         <p className="shrink-0 px-1 text-[11px] text-muted-foreground">
           {polls.length}개 주제 표시 중
