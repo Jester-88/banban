@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo } from "react"
+import { useMemo, type ReactNode } from "react"
 import { Search, X } from "lucide-react"
 import { AdminCreatePoll } from "@/components/admin-create-poll"
 import { PollDeadlineBadge } from "@/components/poll-deadline-badge"
@@ -27,6 +27,59 @@ function matchesSearch(poll: Poll, query: string) {
   return (
     poll.title.toLowerCase().includes(normalized) ||
     poll.tag.toLowerCase().includes(normalized)
+  )
+}
+
+function PollListScrollArea({ children }: { children: ReactNode }) {
+  return (
+    <div className="poll-list-scroll max-h-[640px] pr-0.5">{children}</div>
+  )
+}
+
+function PollCards({
+  polls,
+  selectedSlug,
+  onSelect,
+  trimmedQuery,
+}: {
+  polls: Poll[]
+  selectedSlug: string | null
+  onSelect: (slug: string) => void
+  trimmedQuery: string
+}) {
+  return (
+    <div className="flex flex-col gap-2">
+      {trimmedQuery ? (
+        <p className="sticky top-0 z-10 bg-background/90 px-1 py-1 text-[11px] text-muted-foreground backdrop-blur-sm">
+          {polls.length}개 주제 표시 중
+        </p>
+      ) : null}
+      {polls.map((poll) => {
+        const selected = poll.slug === selectedSlug
+        return (
+          <button
+            key={poll.id}
+            type="button"
+            onClick={() => onSelect(poll.slug)}
+            className={`rounded-2xl border px-4 py-3 text-left transition-all active:scale-[0.99] ${
+              selected
+                ? "border-foreground/25 bg-secondary shadow-sm ring-2 ring-foreground/10"
+                : "border-border bg-card/60 hover:border-foreground/15 hover:bg-card"
+            }`}
+          >
+            <div className="mb-1 flex flex-wrap items-center gap-1.5">
+              <span className="text-[10px] font-bold tracking-wide text-muted-foreground">
+                {poll.tag}
+              </span>
+              <PollDeadlineBadge endsAt={poll.endsAt} />
+            </div>
+            <span className="line-clamp-2 text-sm font-bold leading-snug text-foreground">
+              {poll.title}
+            </span>
+          </button>
+        )
+      })}
+    </div>
   )
 }
 
@@ -122,38 +175,14 @@ export function PollList({
           </button>
         </div>
       ) : (
-        <div className="flex flex-col gap-2">
-          {trimmedQuery ? (
-            <p className="px-1 text-[11px] text-muted-foreground">
-              {filteredPolls.length}개 주제 표시 중
-            </p>
-          ) : null}
-          {filteredPolls.map((poll) => {
-            const selected = poll.slug === selectedSlug
-            return (
-              <button
-                key={poll.id}
-                type="button"
-                onClick={() => onSelect(poll.slug)}
-                className={`rounded-2xl border px-4 py-3 text-left transition-all active:scale-[0.99] ${
-                  selected
-                    ? "border-foreground/25 bg-secondary shadow-sm ring-2 ring-foreground/10"
-                    : "border-border bg-card/60 hover:border-foreground/15 hover:bg-card"
-                }`}
-              >
-                <div className="mb-1 flex flex-wrap items-center gap-1.5">
-                  <span className="text-[10px] font-bold tracking-wide text-muted-foreground">
-                    {poll.tag}
-                  </span>
-                  <PollDeadlineBadge endsAt={poll.endsAt} />
-                </div>
-                <span className="line-clamp-2 text-sm font-bold leading-snug text-foreground">
-                  {poll.title}
-                </span>
-              </button>
-            )
-          })}
-        </div>
+        <PollListScrollArea>
+          <PollCards
+            polls={filteredPolls}
+            selectedSlug={selectedSlug}
+            onSelect={onSelect}
+            trimmedQuery={trimmedQuery}
+          />
+        </PollListScrollArea>
       )}
 
       {adminPanel}
