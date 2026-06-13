@@ -50,7 +50,7 @@ function PollCards({
   trimmedQuery: string
 }) {
   return (
-    <div className="max-h-[280px] min-h-0 overflow-y-auto pr-2 flex flex-col gap-3">
+    <div style={{ height: "300px", overflowY: "auto" }} className="flex flex-col gap-3 pr-2">
       {trimmedQuery ? (
         <p className="shrink-0 px-1 text-[11px] text-muted-foreground">
           {polls.length}개 주제 표시 중
