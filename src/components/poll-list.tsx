@@ -31,7 +31,7 @@ function matchesSearch(poll: Poll, query: string) {
 }
 
 const POLL_LIST_SCROLL_CLASS =
-  "max-h-[350px] overflow-y-auto pr-2 flex flex-col gap-3"
+  "max-h-[240px] overflow-y-auto pr-2 flex flex-col gap-3 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-neutral-700"
 
 function PollListBox({ children }: { children: ReactNode }) {
   return <div className={POLL_LIST_SCROLL_CLASS}>{children}</div>
@@ -49,7 +49,7 @@ function PollCards({
   trimmedQuery: string
 }) {
   return (
-    <div className="max-h-[350px] overflow-y-auto pr-2 flex flex-col gap-3">
+    <div className={POLL_LIST_SCROLL_CLASS}>
       {trimmedQuery ? (
         <p className="shrink-0 px-1 text-[11px] text-muted-foreground">
           {polls.length}개 주제 표시 중
