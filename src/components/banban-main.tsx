@@ -107,9 +107,28 @@ export function BanbanMain() {
   }, [loadPolls])
 
   useEffect(() => {
-    if (existingVote) setVote(existingVote)
-    else if (!user) setVote(null)
-  }, [existingVote, user])
+    setVote(null)
+    setVoteError(null)
+    setRegionModalOpen(false)
+    setPendingChoice(null)
+    setSelectedRegion(null)
+  }, [selectedSlug])
+
+  useEffect(() => {
+    if (!selectedSlug) {
+      setVote(null)
+      return
+    }
+
+    if (authLoading) return
+
+    if (!user) {
+      setVote(null)
+      return
+    }
+
+    setVote(existingVote)
+  }, [selectedSlug, existingVote, user, authLoading])
 
   useEffect(() => {
     if (!user && !authLoading) {

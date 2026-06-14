@@ -118,6 +118,8 @@ export function useAuth(questionSlug: string | null) {
       return
     }
 
+    setExistingVote(null)
+
     let cancelled = false
 
     void (async () => {
