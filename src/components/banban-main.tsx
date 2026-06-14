@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { Check, X, Camera, Share2 } from "lucide-react"
+import { AdminEditPollModal } from "@/components/admin-edit-poll-modal"
 import { KoreaMap } from "@/components/korea-map"
 import { LoginModal } from "@/components/login-modal"
 import { PollDeadlineBadge } from "@/components/poll-deadline-badge"
@@ -66,6 +67,7 @@ export function BanbanMain() {
   const [selectedRegion, setSelectedRegion] = useState<RegionId | null>(null)
   const [logoutBusy, setLogoutBusy] = useState(false)
   const [deleteBusy, setDeleteBusy] = useState(false)
+  const [editingPoll, setEditingPoll] = useState<Poll | null>(null)
   const captureRef = useRef<HTMLDivElement>(null)
 
   const selectedPoll = useMemo(
@@ -156,6 +158,12 @@ export function BanbanMain() {
   function handlePollCreated(poll: Poll) {
     setPolls((prev) => [poll, ...prev])
     setSelectedSlug(poll.slug)
+  }
+
+  function handlePollUpdated(poll: Poll) {
+    setPolls((prev) =>
+      prev.map((item) => (item.id === poll.id ? poll : item)),
+    )
   }
 
   async function handleDeletePoll() {
@@ -423,6 +431,7 @@ export function BanbanMain() {
             deleteBusy={deleteBusy}
             onDeletePoll={isAdmin ? () => void handleDeletePoll() : undefined}
             onPollCreated={isAdmin ? handlePollCreated : undefined}
+            onEditPoll={isAdmin ? setEditingPoll : undefined}
           />
         </section>
 
@@ -579,6 +588,13 @@ export function BanbanMain() {
       </main>
 
       <LoginModal open={loginOpen} onClose={() => setLoginOpen(false)} />
+      {isAdmin ? (
+        <AdminEditPollModal
+          poll={editingPoll}
+          onClose={() => setEditingPoll(null)}
+          onUpdated={handlePollUpdated}
+        />
+      ) : null}
       {requiresRegionSelection ? (
         <RegionSelectModal
           open={regionModalOpen}

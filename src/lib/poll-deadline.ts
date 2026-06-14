@@ -64,6 +64,13 @@ export function minPollEndDateInput(): string {
   return toKstDateString(new Date())
 }
 
+export function endsAtToDateInput(endsAt: string | null | undefined): string {
+  if (!endsAt) return defaultPollEndDateInput()
+  const parsed = new Date(endsAt)
+  if (Number.isNaN(parsed.getTime())) return defaultPollEndDateInput()
+  return toKstDateString(parsed)
+}
+
 export function isValidEndsAtIso(value: string): boolean {
   const parsed = new Date(value)
   return !Number.isNaN(parsed.getTime())

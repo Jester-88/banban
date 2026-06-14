@@ -121,6 +121,47 @@ export async function createPoll(input: CreatePollInput): Promise<Poll> {
   return toPoll(body.poll)
 }
 
+export type UpdatePollInput = {
+  id: string
+  title: string
+  tag?: string
+  endsAt: string
+  requireRegion?: boolean
+}
+
+export async function updatePoll(input: UpdatePollInput): Promise<Poll> {
+  const endsAt = normalizeCreateEndsAt(input.endsAt)
+
+  const response = await fetch("/api/polls", {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify({
+      id: input.id,
+      title: input.title,
+      tag: input.tag,
+      endsAt,
+      requireRegion: input.requireRegion ?? true,
+    }),
+  })
+
+  const body = (await response.json()) as {
+    poll?: PollRow
+    error?: string
+    message?: string
+  }
+
+  if (!response.ok) {
+    throw new Error(body.message ?? body.error ?? "투표 주제 수정에 실패했습니다.")
+  }
+
+  if (!body.poll) {
+    throw new Error("서버 응답이 올바르지 않습니다.")
+  }
+
+  return toPoll(body.poll)
+}
+
 export async function deletePoll(id: string): Promise<void> {
   const response = await fetch("/api/polls", {
     method: "DELETE",

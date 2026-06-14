@@ -3,6 +3,7 @@
 import { useMemo, type ReactNode } from "react"
 import { Search, X } from "lucide-react"
 import { AdminCreatePoll } from "@/components/admin-create-poll"
+import { PollEditButton } from "@/components/admin-edit-poll-modal"
 import { PollDeadlineBadge } from "@/components/poll-deadline-badge"
 import type { Poll } from "@/lib/polls"
 
@@ -18,6 +19,7 @@ type PollListProps = {
   deleteBusy?: boolean
   onDeletePoll?: () => void
   onPollCreated?: (poll: Poll) => void
+  onEditPoll?: (poll: Poll) => void
 }
 
 function matchesSearch(poll: Poll, query: string) {
@@ -42,11 +44,15 @@ function PollCards({
   selectedSlug,
   onSelect,
   trimmedQuery,
+  isAdmin = false,
+  onEditPoll,
 }: {
   polls: Poll[]
   selectedSlug: string | null
   onSelect: (slug: string) => void
   trimmedQuery: string
+  isAdmin?: boolean
+  onEditPoll?: (poll: Poll) => void
 }) {
   return (
     <div className={POLL_LIST_SCROLL_CLASS}>
@@ -58,26 +64,30 @@ function PollCards({
       {polls.map((poll) => {
         const selected = poll.slug === selectedSlug
         return (
-          <button
-            key={poll.id}
-            type="button"
-            onClick={() => onSelect(poll.slug)}
-            className={`shrink-0 rounded-2xl border px-4 py-3 text-left transition-all active:scale-[0.99] ${
-              selected
-                ? "border-foreground/25 bg-secondary shadow-sm ring-2 ring-foreground/10"
-                : "border-border bg-card/60 hover:border-foreground/15 hover:bg-card"
-            }`}
-          >
-            <div className="mb-1 flex flex-wrap items-center gap-1.5">
-              <span className="text-[10px] font-bold tracking-wide text-muted-foreground">
-                {poll.tag}
+          <div key={poll.id} className="flex items-stretch gap-2">
+            <button
+              type="button"
+              onClick={() => onSelect(poll.slug)}
+              className={`min-w-0 flex-1 rounded-2xl border px-4 py-3 text-left transition-all active:scale-[0.99] ${
+                selected
+                  ? "border-foreground/25 bg-secondary shadow-sm ring-2 ring-foreground/10"
+                  : "border-border bg-card/60 hover:border-foreground/15 hover:bg-card"
+              }`}
+            >
+              <div className="mb-1 flex flex-wrap items-center gap-1.5">
+                <span className="text-[10px] font-bold tracking-wide text-muted-foreground">
+                  {poll.tag}
+                </span>
+                <PollDeadlineBadge endsAt={poll.endsAt} />
+              </div>
+              <span className="line-clamp-2 text-sm font-bold leading-snug text-foreground">
+                {poll.title}
               </span>
-              <PollDeadlineBadge endsAt={poll.endsAt} />
-            </div>
-            <span className="line-clamp-2 text-sm font-bold leading-snug text-foreground">
-              {poll.title}
-            </span>
-          </button>
+            </button>
+            {isAdmin && onEditPoll ? (
+              <PollEditButton onClick={() => onEditPoll(poll)} />
+            ) : null}
+          </div>
         )
       })}
     </div>
@@ -96,6 +106,7 @@ export function PollList({
   deleteBusy = false,
   onDeletePoll,
   onPollCreated,
+  onEditPoll,
 }: PollListProps) {
   const filteredPolls = useMemo(
     () => polls.filter((poll) => matchesSearch(poll, searchQuery)),
@@ -187,6 +198,8 @@ export function PollList({
           selectedSlug={selectedSlug}
           onSelect={onSelect}
           trimmedQuery={trimmedQuery}
+          isAdmin={isAdmin}
+          onEditPoll={onEditPoll}
         />
       )}
 

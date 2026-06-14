@@ -235,3 +235,122 @@ export async function DELETE(request: Request) {
 
   return NextResponse.json({ success: true })
 }
+
+export async function PATCH(request: Request) {
+  const supabase = await createSessionSupabase()
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser()
+
+  if (authError || !user) {
+    return NextResponse.json(
+      { error: "NOT_AUTHENTICATED", message: "로그인이 필요합니다." },
+      { status: 401 },
+    )
+  }
+
+  if (!isAdminUser(user.id)) {
+    return NextResponse.json(
+      { error: "FORBIDDEN", message: "관리자만 투표 주제를 수정할 수 있습니다." },
+      { status: 403 },
+    )
+  }
+
+  let body: {
+    id?: string
+    title?: string
+    tag?: string
+    endsAt?: string
+    ends_at?: string
+    requireRegion?: boolean
+    require_region?: boolean
+  }
+
+  try {
+    body = await request.json()
+  } catch {
+    return NextResponse.json(
+      { error: "INVALID_BODY", message: "잘못된 요청입니다." },
+      { status: 400 },
+    )
+  }
+
+  const id = body.id?.trim()
+  if (!id) {
+    return NextResponse.json(
+      { error: "INVALID_ID", message: "수정할 투표 ID가 필요합니다." },
+      { status: 400 },
+    )
+  }
+
+  const title = body.title?.trim()
+  if (!title || title.length < 2) {
+    return NextResponse.json(
+      { error: "INVALID_TITLE", message: "투표 주제를 2자 이상 입력해 주세요." },
+      { status: 400 },
+    )
+  }
+
+  const tag = body.tag?.trim() || DEFAULT_POLL_TAG
+  const endsAt = (body.endsAt ?? body.ends_at)?.trim()
+  if (!endsAt) {
+    return NextResponse.json(
+      { error: "INVALID_ENDS_AT", message: "마감일을 선택해 주세요." },
+      { status: 400 },
+    )
+  }
+
+  const parsedEndsAt = new Date(endsAt)
+  if (Number.isNaN(parsedEndsAt.getTime())) {
+    return NextResponse.json(
+      { error: "INVALID_ENDS_AT", message: "마감일 형식이 올바르지 않습니다." },
+      { status: 400 },
+    )
+  }
+
+  const endsAtIso = parsedEndsAt.toISOString()
+  const requireRegion = body.requireRegion ?? body.require_region ?? true
+
+  let admin
+  try {
+    admin = createAdminClient()
+  } catch (e) {
+    console.error("[banban] admin client error:", e)
+    return NextResponse.json(
+      {
+        error: "SERVER_CONFIG",
+        message: "서버 설정(SUPABASE_SERVICE_ROLE_KEY)이 필요합니다.",
+      },
+      { status: 500 },
+    )
+  }
+
+  const { data, error } = await admin
+    .from(POLLS_TABLE)
+    .update({
+      [POLL_COLUMNS.title]: title,
+      [POLL_COLUMNS.tag]: tag,
+      [POLL_COLUMNS.endsAt]: endsAtIso,
+      [POLL_COLUMNS.requireRegion]: requireRegion,
+    })
+    .eq(POLL_COLUMNS.id, id)
+    .select(
+      `${POLL_COLUMNS.id}, ${POLL_COLUMNS.slug}, ${POLL_COLUMNS.title}, ${POLL_COLUMNS.tag}, ${POLL_COLUMNS.createdAt}, ${POLL_COLUMNS.endsAt}, ${POLL_COLUMNS.requireRegion}`,
+    )
+    .single()
+
+  if (error || !data) {
+    console.error("[banban] poll update error:", error)
+    return NextResponse.json(
+      {
+        error: "UPDATE_FAILED",
+        message: error?.message ?? "투표 주제 수정에 실패했습니다.",
+        code: error?.code ?? null,
+      },
+      { status: 500 },
+    )
+  }
+
+  return NextResponse.json({ poll: data }, { status: 200 })
+}
