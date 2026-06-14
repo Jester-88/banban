@@ -10,6 +10,7 @@ export type Poll = {
   tag: string
   createdAt: string
   endsAt: string | null
+  requireRegion: boolean
 }
 
 export type CreatePollInput = {
@@ -17,6 +18,7 @@ export type CreatePollInput = {
   tag?: string
   /** ISO 8601 timestamptz 또는 YYYY-MM-DD (KST 마감일) */
   endsAt: string
+  requireRegion?: boolean
 }
 
 export const POLL_SELECT_COLUMNS = [
@@ -26,6 +28,7 @@ export const POLL_SELECT_COLUMNS = [
   POLL_COLUMNS.tag,
   POLL_COLUMNS.createdAt,
   POLL_COLUMNS.endsAt,
+  POLL_COLUMNS.requireRegion,
 ].join(", ")
 
 type PollRow = {
@@ -37,6 +40,8 @@ type PollRow = {
   createdAt?: string | null
   ends_at?: string | null
   endsAt?: string | null
+  require_region?: boolean | null
+  requireRegion?: boolean | null
 }
 
 function normalizeEndsAt(value: string | null | undefined): string | null {
@@ -54,6 +59,7 @@ function toPoll(row: PollRow): Poll {
     tag: row.tag?.trim() || DEFAULT_POLL_TAG,
     createdAt: row.created_at ?? row.createdAt ?? "",
     endsAt: normalizeEndsAt(row.ends_at ?? row.endsAt ?? null),
+    requireRegion: row.require_region ?? row.requireRegion ?? true,
   }
 }
 
@@ -94,6 +100,7 @@ export async function createPoll(input: CreatePollInput): Promise<Poll> {
       title: input.title,
       tag: input.tag,
       endsAt,
+      requireRegion: input.requireRegion ?? true,
     }),
   })
 

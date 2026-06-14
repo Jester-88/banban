@@ -179,6 +179,8 @@ export function BanbanMain() {
     [selectedPoll?.endsAt],
   )
 
+  const requiresRegionSelection = selectedPoll?.requireRegion !== false
+
   function openRegionModal(choice: VoteChoice) {
     if (!selectedSlug || busy === "vote" || hasVoted || pollDeadline.isExpired)
       return
@@ -189,6 +191,12 @@ export function BanbanMain() {
     }
 
     setVoteError(null)
+
+    if (!requiresRegionSelection) {
+      void submitVoteFlow(choice, null)
+      return
+    }
+
     setPendingChoice(choice)
     setSelectedRegion(null)
     setRegionModalOpen(true)
@@ -201,11 +209,12 @@ export function BanbanMain() {
     setSelectedRegion(null)
   }
 
-  async function handleRegionVoteSubmit() {
+  async function submitVoteFlow(
+    choice: VoteChoice,
+    region: RegionId | null,
+  ) {
     if (
       !selectedSlug ||
-      !pendingChoice ||
-      !selectedRegion ||
       busy === "vote" ||
       hasVoted ||
       pollDeadline.isExpired
@@ -217,8 +226,8 @@ export function BanbanMain() {
     setBusy("vote")
 
     try {
-      await submitVote(selectedSlug, pendingChoice, selectedRegion)
-      setVote(pendingChoice)
+      await submitVote(selectedSlug, choice, region)
+      setVote(choice)
       await refreshStats(selectedSlug)
       await refreshUserVote()
       setRegionModalOpen(false)
@@ -230,7 +239,7 @@ export function BanbanMain() {
       alert(formatVoteErrorAlert(e))
 
       if (e instanceof VoteError && e.code === "ALREADY_VOTED") {
-        setVote(existingVote ?? pendingChoice)
+        setVote(existingVote ?? choice)
         setVoteError(e.message)
         setRegionModalOpen(false)
         setPendingChoice(null)
@@ -260,6 +269,21 @@ export function BanbanMain() {
     } finally {
       setBusy(null)
     }
+  }
+
+  async function handleRegionVoteSubmit() {
+    if (
+      !selectedSlug ||
+      !pendingChoice ||
+      !selectedRegion ||
+      busy === "vote" ||
+      hasVoted ||
+      pollDeadline.isExpired
+    ) {
+      return
+    }
+
+    await submitVoteFlow(pendingChoice, selectedRegion)
   }
 
   async function handleLogout() {
@@ -507,17 +531,19 @@ export function BanbanMain() {
                 </div>
               </section>
 
-              <section className="mt-4 rounded-3xl border border-border bg-card/60 p-3">
-                <div className="mb-1 flex items-center justify-between px-1">
-                  <p className="text-sm font-bold text-foreground">
-                    지역별 결과
-                  </p>
-                  <p className="text-[11px] text-muted-foreground">
-                    지역을 눌러 상세 보기
-                  </p>
-                </div>
-                <KoreaMap regions={regionStats} loading={totalsLoading} />
-              </section>
+              {requiresRegionSelection ? (
+                <section className="mt-4 rounded-3xl border border-border bg-card/60 p-3">
+                  <div className="mb-1 flex items-center justify-between px-1">
+                    <p className="text-sm font-bold text-foreground">
+                      지역별 결과
+                    </p>
+                    <p className="text-[11px] text-muted-foreground">
+                      지역을 눌러 상세 보기
+                    </p>
+                  </div>
+                  <KoreaMap regions={regionStats} loading={totalsLoading} />
+                </section>
+              ) : null}
             </>
           ) : (
             <section className="mt-7 rounded-2xl border border-dashed border-border bg-card/40 px-4 py-10 text-center">
@@ -553,15 +579,17 @@ export function BanbanMain() {
       </main>
 
       <LoginModal open={loginOpen} onClose={() => setLoginOpen(false)} />
-      <RegionSelectModal
-        open={regionModalOpen}
-        choice={pendingChoice}
-        selectedRegion={selectedRegion}
-        submitting={busy === "vote"}
-        onSelectRegion={setSelectedRegion}
-        onSubmit={() => void handleRegionVoteSubmit()}
-        onClose={closeRegionModal}
-      />
+      {requiresRegionSelection ? (
+        <RegionSelectModal
+          open={regionModalOpen}
+          choice={pendingChoice}
+          selectedRegion={selectedRegion}
+          submitting={busy === "vote"}
+          onSelectRegion={setSelectedRegion}
+          onSubmit={() => void handleRegionVoteSubmit()}
+          onClose={closeRegionModal}
+        />
+      ) : null}
 
       <div className="fixed bottom-2 right-2 z-[100] max-w-[min(100vw-1rem,360px)] truncate px-1 text-[10px] font-mono text-red-500">
         디버그 - 현재 로그인된 유저 ID: {user?.id || "로그인 안 됨 (null)"}

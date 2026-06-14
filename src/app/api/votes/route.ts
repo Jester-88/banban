@@ -114,7 +114,7 @@ export async function POST(request: Request) {
     )
   }
 
-  if (!region || !isRegionId(region)) {
+  if (region && !isRegionId(region)) {
     return NextResponse.json(
       { error: "INVALID_REGION", message: "유효하지 않은 지역입니다." },
       { status: 400 },
@@ -148,7 +148,7 @@ export async function POST(request: Request) {
   const { error: insertError } = await supabase.from(VOTES_TABLE).insert({
     [VOTE_COLUMNS.questionSlug]: questionSlug,
     [VOTE_COLUMNS.choice]: choice,
-    [VOTE_COLUMNS.region]: region,
+    [VOTE_COLUMNS.region]: region ?? null,
     [VOTE_COLUMNS.userId]: user.id,
   })
 

@@ -7,4 +7,5 @@ export const POLL_COLUMNS = {
   tag: "tag",
   createdAt: "created_at",
   endsAt: "ends_at",
+  requireRegion: "require_region",
 } as const

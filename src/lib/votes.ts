@@ -220,7 +220,7 @@ function toVoteError(
 export async function submitVote(
   questionSlug: string,
   choice: VoteChoice,
-  region: RegionId,
+  region?: RegionId | null,
 ): Promise<void> {
   const response = await fetch("/api/votes", {
     method: "POST",
@@ -230,7 +230,7 @@ export async function submitVote(
     body: JSON.stringify({
       [VOTE_COLUMNS.questionSlug]: questionSlug,
       [VOTE_COLUMNS.choice]: choice,
-      [VOTE_COLUMNS.region]: region,
+      ...(region ? { [VOTE_COLUMNS.region]: region } : {}),
     }),
   })
 

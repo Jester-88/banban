@@ -7,7 +7,8 @@ create table if not exists public.polls (
   title text not null,
   tag text default '오늘의 반반',
   created_at timestamptz not null default now(),
-  ends_at timestamptz
+  ends_at timestamptz,
+  require_region boolean not null default true
 );
 
 create index if not exists polls_created_at_idx on public.polls (created_at desc);

@@ -48,7 +48,14 @@ export async function POST(request: Request) {
     )
   }
 
-  let body: { title?: string; tag?: string; endsAt?: string; ends_at?: string }
+  let body: {
+    title?: string
+    tag?: string
+    endsAt?: string
+    ends_at?: string
+    requireRegion?: boolean
+    require_region?: boolean
+  }
 
   try {
     body = await request.json()
@@ -95,6 +102,7 @@ export async function POST(request: Request) {
   }
 
   const endsAtIso = parsedEndsAt.toISOString()
+  const requireRegion = body.requireRegion ?? body.require_region ?? true
   const baseSlug = generateSlugFromTitle(title)
 
   let admin
@@ -123,9 +131,10 @@ export async function POST(request: Request) {
         [POLL_COLUMNS.title]: title,
         [POLL_COLUMNS.tag]: tag,
         [POLL_COLUMNS.endsAt]: endsAtIso,
+        [POLL_COLUMNS.requireRegion]: requireRegion,
       })
       .select(
-        `${POLL_COLUMNS.id}, ${POLL_COLUMNS.slug}, ${POLL_COLUMNS.title}, ${POLL_COLUMNS.tag}, ${POLL_COLUMNS.createdAt}, ${POLL_COLUMNS.endsAt}`,
+        `${POLL_COLUMNS.id}, ${POLL_COLUMNS.slug}, ${POLL_COLUMNS.title}, ${POLL_COLUMNS.tag}, ${POLL_COLUMNS.createdAt}, ${POLL_COLUMNS.endsAt}, ${POLL_COLUMNS.requireRegion}`,
       )
       .single()
 

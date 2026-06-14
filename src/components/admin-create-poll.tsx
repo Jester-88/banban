@@ -16,6 +16,7 @@ export function AdminCreatePoll({ onCreated }: AdminCreatePollProps) {
   const [title, setTitle] = useState("")
   const [tag, setTag] = useState(DEFAULT_POLL_TAG)
   const [endsAtDate, setEndsAtDate] = useState(defaultPollEndDateInput)
+  const [requireRegion, setRequireRegion] = useState(true)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -47,10 +48,12 @@ export function AdminCreatePoll({ onCreated }: AdminCreatePollProps) {
         title: trimmed,
         tag: tag.trim() || DEFAULT_POLL_TAG,
         endsAt: endsAtDate,
+        requireRegion,
       })
       setTitle("")
       setTag(DEFAULT_POLL_TAG)
       setEndsAtDate(defaultPollEndDateInput())
+      setRequireRegion(true)
       setOpen(false)
       onCreated(poll)
     } catch (e) {
@@ -113,7 +116,7 @@ export function AdminCreatePoll({ onCreated }: AdminCreatePollProps) {
         />
       </label>
 
-      <label className="mb-4 block">
+      <label className="mb-3 block">
         <span className="mb-1.5 block text-xs font-semibold text-muted-foreground">
           마감일
         </span>
@@ -129,6 +132,33 @@ export function AdminCreatePoll({ onCreated }: AdminCreatePollProps) {
         <span className="mt-1.5 block text-[11px] text-muted-foreground">
           선택한 날짜 23:59(KST)까지 투표할 수 있습니다.
         </span>
+      </label>
+
+      <label className="mb-4 flex cursor-pointer items-center justify-between gap-3 rounded-xl border border-border bg-card px-3 py-3">
+        <div>
+          <span className="block text-xs font-semibold text-foreground">
+            지역 선택 활성화
+          </span>
+          <span className="mt-0.5 block text-[11px] text-muted-foreground">
+            끄면 투표 시 구·군 선택 없이 바로 참여합니다.
+          </span>
+        </div>
+        <button
+          type="button"
+          role="switch"
+          aria-checked={requireRegion}
+          onClick={() => setRequireRegion((prev) => !prev)}
+          disabled={busy}
+          className={`relative h-7 w-12 shrink-0 rounded-full transition-colors disabled:opacity-50 ${
+            requireRegion ? "bg-emerald-500" : "bg-muted-foreground/30"
+          }`}
+        >
+          <span
+            className={`absolute top-0.5 size-6 rounded-full bg-white shadow transition-transform ${
+              requireRegion ? "left-[22px]" : "left-0.5"
+            }`}
+          />
+        </button>
       </label>
 
       {error ? (
