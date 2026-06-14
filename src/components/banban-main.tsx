@@ -469,17 +469,23 @@ export function BanbanMain() {
                       onClick={() => openRegionModal("agree")}
                       disabled={voteDisabled}
                       aria-pressed={vote === "agree"}
-                      className={`group flex h-28 flex-col items-center justify-center gap-2 rounded-3xl border-2 transition-all active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-60 ${
+                      className={`group flex h-28 flex-col items-center justify-center gap-2 rounded-3xl border-2 transition-all duration-300 active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-60 ${
                         vote === "agree"
                           ? "border-transparent bg-[var(--agree)] text-[var(--agree-foreground)] shadow-lg shadow-[var(--agree)]/30"
-                          : "border-border bg-card text-foreground hover:border-[var(--agree)]"
+                          : "border-[var(--agree)] bg-transparent text-[var(--agree)] hover:border-[var(--agree)] hover:bg-[var(--agree)] hover:text-[var(--agree-foreground)]"
                       }`}
                     >
                       <Check
-                        className={`size-8 ${vote === "agree" ? "" : "text-[var(--agree)]"}`}
+                        className={`size-8 transition-colors duration-300 ${
+                          vote === "agree"
+                            ? "text-[var(--agree-foreground)]"
+                            : "text-[var(--agree)] group-hover:text-[var(--agree-foreground)]"
+                        }`}
                         strokeWidth={2.5}
                       />
-                      <span className="text-lg font-extrabold">찬성</span>
+                      <span className="text-lg font-extrabold transition-colors duration-300">
+                        찬성
+                      </span>
                     </button>
 
                     <button
@@ -487,17 +493,23 @@ export function BanbanMain() {
                       onClick={() => openRegionModal("disagree")}
                       disabled={voteDisabled}
                       aria-pressed={vote === "disagree"}
-                      className={`group flex h-28 flex-col items-center justify-center gap-2 rounded-3xl border-2 transition-all active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-60 ${
+                      className={`group flex h-28 flex-col items-center justify-center gap-2 rounded-3xl border-2 transition-all duration-300 active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-60 ${
                         vote === "disagree"
                           ? "border-transparent bg-[var(--disagree)] text-[var(--disagree-foreground)] shadow-lg shadow-[var(--disagree)]/30"
-                          : "border-border bg-card text-foreground hover:border-[var(--disagree)]"
+                          : "border-[var(--disagree)] bg-transparent text-[var(--disagree)] hover:border-[var(--disagree)] hover:bg-[var(--disagree)] hover:text-[var(--disagree-foreground)]"
                       }`}
                     >
                       <X
-                        className={`size-8 ${vote === "disagree" ? "" : "text-[var(--disagree)]"}`}
+                        className={`size-8 transition-colors duration-300 ${
+                          vote === "disagree"
+                            ? "text-[var(--disagree-foreground)]"
+                            : "text-[var(--disagree)] group-hover:text-[var(--disagree-foreground)]"
+                        }`}
                         strokeWidth={2.5}
                       />
-                      <span className="text-lg font-extrabold">반대</span>
+                      <span className="text-lg font-extrabold transition-colors duration-300">
+                        반대
+                      </span>
                     </button>
                   </div>
                 </section>
