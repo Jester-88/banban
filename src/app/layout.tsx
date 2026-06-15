@@ -13,25 +13,26 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 })
 
-const SITE_URL = "https://banban-d9aa.vercel.app"
+const metadataBase = new URL("https://banban-d9aa.vercel.app/")
+const ogImageUrl = new URL("/og-image.png", metadataBase)
+
 const SITE_TITLE = "반반 · BANBAN"
-const SITE_DESCRIPTION =
-  "오늘의 이슈, 찬성과 반대로 나눠 보세요. 전국 실시간 투표 플랫폼"
+const SITE_DESCRIPTION = "이슈 찬성 , 반대 당신의 선택은?"
 
 export const metadata: Metadata = {
-  metadataBase: new URL(SITE_URL),
+  metadataBase,
   title: SITE_TITLE,
   description: SITE_DESCRIPTION,
   openGraph: {
     title: SITE_TITLE,
     description: SITE_DESCRIPTION,
-    url: SITE_URL,
+    url: metadataBase,
     siteName: "반반",
     locale: "ko_KR",
     type: "website",
     images: [
       {
-        url: "/og-image.png",
+        url: ogImageUrl,
         width: 1200,
         height: 630,
         alt: "반반 BANBAN - 오늘의 이슈, 전국이 반반으로 나뉩니다",
@@ -42,7 +43,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: SITE_TITLE,
     description: SITE_DESCRIPTION,
-    images: ["/og-image.png"],
+    images: [ogImageUrl],
   },
 }
 
