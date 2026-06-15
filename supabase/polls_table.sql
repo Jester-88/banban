@@ -8,7 +8,9 @@ create table if not exists public.polls (
   tag text default '오늘의 반반',
   created_at timestamptz not null default now(),
   ends_at timestamptz,
-  require_region boolean not null default true
+  require_region boolean not null default true,
+  option_a_label text not null default '찬성',
+  option_b_label text not null default '반대'
 );
 
 create index if not exists polls_created_at_idx on public.polls (created_at desc);

@@ -3,7 +3,8 @@ import { cookies } from "next/headers"
 import { NextResponse } from "next/server"
 import { isAdminUser } from "@/lib/admin"
 import { DEFAULT_POLL_TAG } from "@/lib/banban-data"
-import { POLL_COLUMNS, POLLS_TABLE } from "@/lib/polls-schema"
+import { resolveOptionLabels } from "@/lib/poll-options"
+import { POLL_COLUMNS, POLLS_TABLE, POLL_SELECT_COLUMNS } from "@/lib/polls-schema"
 import { generateSlugFromTitle, withUniqueSlugSuffix } from "@/lib/slug"
 import { createAdminClient } from "@/lib/supabase/admin"
 
@@ -55,6 +56,10 @@ export async function POST(request: Request) {
     ends_at?: string
     requireRegion?: boolean
     require_region?: boolean
+    optionALabel?: string
+    option_a_label?: string
+    optionBLabel?: string
+    option_b_label?: string
   }
 
   try {
@@ -103,6 +108,7 @@ export async function POST(request: Request) {
 
   const endsAtIso = parsedEndsAt.toISOString()
   const requireRegion = body.requireRegion ?? body.require_region ?? true
+  const { optionALabel, optionBLabel } = resolveOptionLabels(body)
   const baseSlug = generateSlugFromTitle(title)
 
   let admin
@@ -132,14 +138,14 @@ export async function POST(request: Request) {
         [POLL_COLUMNS.tag]: tag,
         [POLL_COLUMNS.endsAt]: endsAtIso,
         [POLL_COLUMNS.requireRegion]: requireRegion,
+        [POLL_COLUMNS.optionALabel]: optionALabel,
+        [POLL_COLUMNS.optionBLabel]: optionBLabel,
       })
-      .select(
-        `${POLL_COLUMNS.id}, ${POLL_COLUMNS.slug}, ${POLL_COLUMNS.title}, ${POLL_COLUMNS.tag}, ${POLL_COLUMNS.createdAt}, ${POLL_COLUMNS.endsAt}, ${POLL_COLUMNS.requireRegion}`,
-      )
+      .select(POLL_SELECT_COLUMNS)
       .single()
 
     if (!error && data) {
-      inserted = data as Record<string, unknown>
+      inserted = data as unknown as Record<string, unknown>
       break
     }
 
@@ -265,6 +271,10 @@ export async function PATCH(request: Request) {
     ends_at?: string
     requireRegion?: boolean
     require_region?: boolean
+    optionALabel?: string
+    option_a_label?: string
+    optionBLabel?: string
+    option_b_label?: string
   }
 
   try {
@@ -311,6 +321,7 @@ export async function PATCH(request: Request) {
 
   const endsAtIso = parsedEndsAt.toISOString()
   const requireRegion = body.requireRegion ?? body.require_region ?? true
+  const { optionALabel, optionBLabel } = resolveOptionLabels(body)
 
   let admin
   try {
@@ -333,11 +344,11 @@ export async function PATCH(request: Request) {
       [POLL_COLUMNS.tag]: tag,
       [POLL_COLUMNS.endsAt]: endsAtIso,
       [POLL_COLUMNS.requireRegion]: requireRegion,
+      [POLL_COLUMNS.optionALabel]: optionALabel,
+      [POLL_COLUMNS.optionBLabel]: optionBLabel,
     })
     .eq(POLL_COLUMNS.id, id)
-    .select(
-      `${POLL_COLUMNS.id}, ${POLL_COLUMNS.slug}, ${POLL_COLUMNS.title}, ${POLL_COLUMNS.tag}, ${POLL_COLUMNS.createdAt}, ${POLL_COLUMNS.endsAt}, ${POLL_COLUMNS.requireRegion}`,
-    )
+    .select(POLL_SELECT_COLUMNS)
     .single()
 
   if (error || !data) {

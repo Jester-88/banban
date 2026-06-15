@@ -14,6 +14,10 @@ import { isAdminUser } from "@/lib/admin"
 import type { RegionId } from "@/lib/banban-data"
 import { useAuth } from "@/hooks/use-auth"
 import { getPollDeadlineStatus } from "@/lib/poll-deadline"
+import {
+  DEFAULT_OPTION_A_LABEL,
+  DEFAULT_OPTION_B_LABEL,
+} from "@/lib/poll-options"
 import { deletePoll, fetchPolls, type Poll } from "@/lib/polls"
 import {
   buildEmptyRegionStats,
@@ -74,6 +78,11 @@ export function BanbanMain() {
     () => polls.find((poll) => poll.slug === selectedSlug) ?? null,
     [polls, selectedSlug],
   )
+
+  const optionALabel =
+    selectedPoll?.optionALabel.trim() || DEFAULT_OPTION_A_LABEL
+  const optionBLabel =
+    selectedPoll?.optionBLabel.trim() || DEFAULT_OPTION_B_LABEL
 
   const isAdmin = isAdminUser(user?.id)
 
@@ -351,7 +360,7 @@ export function BanbanMain() {
     setBusy("share")
     const shareData = {
       title: "반반 · BANBAN",
-      text: `${selectedPoll.tag}: ${selectedPoll.title}\n전국 찬성 ${totals.agreeRate}% vs 반대 ${totals.disagreeRate}%`,
+      text: `${selectedPoll.tag}: ${selectedPoll.title}\n전국 ${optionALabel} ${totals.agreeRate}% vs ${optionBLabel} ${totals.disagreeRate}%`,
       url: typeof window !== "undefined" ? window.location.href : "",
     }
     try {
@@ -474,6 +483,8 @@ export function BanbanMain() {
                   userChoice={existingVote}
                   totals={totals}
                   loading={totalsLoading}
+                  optionALabel={optionALabel}
+                  optionBLabel={optionBLabel}
                 />
               ) : (
                 <section className="mt-6">
@@ -503,7 +514,7 @@ export function BanbanMain() {
                         strokeWidth={2.5}
                       />
                       <span className="text-lg font-extrabold transition-colors duration-300">
-                        찬성
+                        {optionALabel}
                       </span>
                     </button>
 
@@ -527,7 +538,7 @@ export function BanbanMain() {
                         strokeWidth={2.5}
                       />
                       <span className="text-lg font-extrabold transition-colors duration-300">
-                        반대
+                        {optionBLabel}
                       </span>
                     </button>
                   </div>
@@ -557,13 +568,13 @@ export function BanbanMain() {
                 </div>
                 <div className="mt-1.5 flex justify-between text-[11px] text-muted-foreground">
                   <span>
-                    전국 찬성{" "}
+                    전국 {optionALabel}{" "}
                     {totalsLoading
                       ? ""
                       : `(${totals.agreeCount.toLocaleString()})`}
                   </span>
                   <span>
-                    전국 반대{" "}
+                    전국 {optionBLabel}{" "}
                     {totalsLoading
                       ? ""
                       : `(${totals.disagreeCount.toLocaleString()})`}
@@ -581,7 +592,12 @@ export function BanbanMain() {
                       지역을 눌러 상세 보기
                     </p>
                   </div>
-                  <KoreaMap regions={regionStats} loading={totalsLoading} />
+                  <KoreaMap
+                    regions={regionStats}
+                    loading={totalsLoading}
+                    optionALabel={optionALabel}
+                    optionBLabel={optionBLabel}
+                  />
                 </section>
               ) : null}
             </>
@@ -632,6 +648,8 @@ export function BanbanMain() {
           choice={pendingChoice}
           selectedRegion={selectedRegion}
           submitting={busy === "vote"}
+          optionALabel={optionALabel}
+          optionBLabel={optionBLabel}
           onSelectRegion={setSelectedRegion}
           onSubmit={() => void handleRegionVoteSubmit()}
           onClose={closeRegionModal}

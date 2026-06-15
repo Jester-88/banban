@@ -4,6 +4,10 @@ import { useEffect } from "react"
 import { Check, MapPin, X } from "lucide-react"
 import { VOTE_REGION_OPTIONS } from "@/lib/banban-data"
 import type { RegionId } from "@/lib/banban-data"
+import {
+  DEFAULT_OPTION_A_LABEL,
+  DEFAULT_OPTION_B_LABEL,
+} from "@/lib/poll-options"
 import type { VoteChoice } from "@/lib/votes"
 
 type RegionSelectModalProps = {
@@ -11,6 +15,8 @@ type RegionSelectModalProps = {
   choice: VoteChoice | null
   selectedRegion: RegionId | null
   submitting: boolean
+  optionALabel?: string
+  optionBLabel?: string
   onSelectRegion: (region: RegionId) => void
   onSubmit: () => void
   onClose: () => void
@@ -21,6 +27,8 @@ export function RegionSelectModal({
   choice,
   selectedRegion,
   submitting,
+  optionALabel = DEFAULT_OPTION_A_LABEL,
+  optionBLabel = DEFAULT_OPTION_B_LABEL,
   onSelectRegion,
   onSubmit,
   onClose,
@@ -40,7 +48,10 @@ export function RegionSelectModal({
 
   if (!open || !choice) return null
 
-  const choiceLabel = choice === "agree" ? "찬성" : "반대"
+  const choiceLabel =
+    choice === "agree"
+      ? optionALabel.trim() || DEFAULT_OPTION_A_LABEL
+      : optionBLabel.trim() || DEFAULT_OPTION_B_LABEL
   const choiceColor =
     choice === "agree" ? "var(--agree)" : "var(--disagree)"
 

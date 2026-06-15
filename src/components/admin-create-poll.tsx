@@ -4,6 +4,10 @@ import { useState } from "react"
 import { Plus } from "lucide-react"
 import { DEFAULT_POLL_TAG } from "@/lib/banban-data"
 import { defaultPollEndDateInput, minPollEndDateInput } from "@/lib/poll-deadline"
+import {
+  DEFAULT_OPTION_A_LABEL,
+  DEFAULT_OPTION_B_LABEL,
+} from "@/lib/poll-options"
 import { createPoll } from "@/lib/polls"
 import type { Poll } from "@/lib/polls"
 
@@ -17,6 +21,8 @@ export function AdminCreatePoll({ onCreated }: AdminCreatePollProps) {
   const [tag, setTag] = useState(DEFAULT_POLL_TAG)
   const [endsAtDate, setEndsAtDate] = useState(defaultPollEndDateInput)
   const [requireRegion, setRequireRegion] = useState(true)
+  const [optionALabel, setOptionALabel] = useState(DEFAULT_OPTION_A_LABEL)
+  const [optionBLabel, setOptionBLabel] = useState(DEFAULT_OPTION_B_LABEL)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -49,11 +55,15 @@ export function AdminCreatePoll({ onCreated }: AdminCreatePollProps) {
         tag: tag.trim() || DEFAULT_POLL_TAG,
         endsAt: endsAtDate,
         requireRegion,
+        optionALabel: optionALabel.trim() || DEFAULT_OPTION_A_LABEL,
+        optionBLabel: optionBLabel.trim() || DEFAULT_OPTION_B_LABEL,
       })
       setTitle("")
       setTag(DEFAULT_POLL_TAG)
       setEndsAtDate(defaultPollEndDateInput())
       setRequireRegion(true)
+      setOptionALabel(DEFAULT_OPTION_A_LABEL)
+      setOptionBLabel(DEFAULT_OPTION_B_LABEL)
       setOpen(false)
       onCreated(poll)
     } catch (e) {
@@ -115,6 +125,35 @@ export function AdminCreatePoll({ onCreated }: AdminCreatePollProps) {
           disabled={busy}
         />
       </label>
+
+      <div className="mb-3 grid grid-cols-2 gap-2">
+        <label className="block">
+          <span className="mb-1.5 block text-xs font-semibold text-muted-foreground">
+            선택지 A 문구
+          </span>
+          <input
+            type="text"
+            value={optionALabel}
+            onChange={(e) => setOptionALabel(e.target.value)}
+            placeholder={DEFAULT_OPTION_A_LABEL}
+            className="w-full rounded-xl border border-border bg-card px-3 py-2.5 text-sm text-foreground outline-none ring-emerald-500/30 focus:ring-2"
+            disabled={busy}
+          />
+        </label>
+        <label className="block">
+          <span className="mb-1.5 block text-xs font-semibold text-muted-foreground">
+            선택지 B 문구
+          </span>
+          <input
+            type="text"
+            value={optionBLabel}
+            onChange={(e) => setOptionBLabel(e.target.value)}
+            placeholder={DEFAULT_OPTION_B_LABEL}
+            className="w-full rounded-xl border border-border bg-card px-3 py-2.5 text-sm text-foreground outline-none ring-emerald-500/30 focus:ring-2"
+            disabled={busy}
+          />
+        </label>
+      </div>
 
       <label className="mb-3 block">
         <span className="mb-1.5 block text-xs font-semibold text-muted-foreground">

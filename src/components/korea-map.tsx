@@ -1,6 +1,10 @@
 "use client"
 
 import { useMemo, useState } from "react"
+import {
+  DEFAULT_OPTION_A_LABEL,
+  DEFAULT_OPTION_B_LABEL,
+} from "@/lib/poll-options"
 import type { RegionId } from "@/lib/banban-data"
 import type { RegionVoteStats } from "@/lib/votes"
 
@@ -46,9 +50,18 @@ const STATUS_STYLES: Record<RegionStatus, string> = {
 type KoreaMapProps = {
   regions: RegionVoteStats[]
   loading?: boolean
+  optionALabel?: string
+  optionBLabel?: string
 }
 
-export function KoreaMap({ regions, loading = false }: KoreaMapProps) {
+export function KoreaMap({
+  regions,
+  loading = false,
+  optionALabel = DEFAULT_OPTION_A_LABEL,
+  optionBLabel = DEFAULT_OPTION_B_LABEL,
+}: KoreaMapProps) {
+  const agreeLabel = optionALabel.trim() || DEFAULT_OPTION_A_LABEL
+  const disagreeLabel = optionBLabel.trim() || DEFAULT_OPTION_B_LABEL
   const [selected, setSelected] = useState<RegionId | null>("gyeongnam")
 
   const regionById = useMemo(
@@ -97,11 +110,11 @@ export function KoreaMap({ regions, loading = false }: KoreaMapProps) {
       <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-gray-300">
         <div className="flex items-center gap-2">
           <div className="h-3 w-3 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]" />
-          찬성 우세
+          {agreeLabel} 우세
         </div>
         <div className="flex items-center gap-2">
           <div className="h-3 w-3 rounded-full bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.8)]" />
-          반대 우세
+          {disagreeLabel} 우세
         </div>
         <div className="flex items-center gap-2">
           <div className="h-3 w-3 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.8)]" />
@@ -156,13 +169,13 @@ export function KoreaMap({ regions, loading = false }: KoreaMapProps) {
 
               <div className="flex gap-4">
                 <div className="flex-1 rounded-xl border border-white/5 bg-white/5 p-4">
-                  <p className="mb-1 text-sm text-gray-400">찬성</p>
+                  <p className="mb-1 text-sm text-gray-400">{agreeLabel}</p>
                   <p className="text-xl font-bold text-emerald-400">
                     {active.agreeCount.toLocaleString()}표
                   </p>
                 </div>
                 <div className="flex-1 rounded-xl border border-white/5 bg-white/5 p-4 text-right">
-                  <p className="mb-1 text-sm text-gray-400">반대</p>
+                  <p className="mb-1 text-sm text-gray-400">{disagreeLabel}</p>
                   <p className="text-xl font-bold text-rose-400">
                     {active.disagreeCount.toLocaleString()}표
                   </p>
@@ -171,9 +184,9 @@ export function KoreaMap({ regions, loading = false }: KoreaMapProps) {
 
               <p className="text-center text-[10px] text-white/30">
                 {activeStatus === "agree"
-                  ? "이 지역은 찬성이 우세합니다"
+                  ? `이 지역은 ${agreeLabel}이(가) 우세합니다`
                   : activeStatus === "disagree"
-                    ? "이 지역은 반대가 우세합니다"
+                    ? `이 지역은 ${disagreeLabel}이(가) 우세합니다`
                     : "이 지역은 의견이 팽팽합니다"}
               </p>
             </div>

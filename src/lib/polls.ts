@@ -1,6 +1,12 @@
 import { DEFAULT_POLL_TAG } from "@/lib/banban-data"
+import {
+  DEFAULT_OPTION_A_LABEL,
+  DEFAULT_OPTION_B_LABEL,
+  normalizeOptionLabel,
+  resolveOptionLabels,
+} from "@/lib/poll-options"
 import { dateInputToEndsAt, isValidEndsAtIso } from "@/lib/poll-deadline"
-import { POLL_COLUMNS, POLLS_TABLE } from "@/lib/polls-schema"
+import { POLL_COLUMNS, POLLS_TABLE, POLL_SELECT_COLUMNS } from "@/lib/polls-schema"
 import { createClient } from "@/lib/supabase/client"
 
 export type Poll = {
@@ -11,6 +17,8 @@ export type Poll = {
   createdAt: string
   endsAt: string | null
   requireRegion: boolean
+  optionALabel: string
+  optionBLabel: string
 }
 
 export type CreatePollInput = {
@@ -19,17 +27,19 @@ export type CreatePollInput = {
   /** ISO 8601 timestamptz 또는 YYYY-MM-DD (KST 마감일) */
   endsAt: string
   requireRegion?: boolean
+  optionALabel?: string
+  optionBLabel?: string
 }
 
-export const POLL_SELECT_COLUMNS = [
-  POLL_COLUMNS.id,
-  POLL_COLUMNS.slug,
-  POLL_COLUMNS.title,
-  POLL_COLUMNS.tag,
-  POLL_COLUMNS.createdAt,
-  POLL_COLUMNS.endsAt,
-  POLL_COLUMNS.requireRegion,
-].join(", ")
+export type UpdatePollInput = {
+  id: string
+  title: string
+  tag?: string
+  endsAt: string
+  requireRegion?: boolean
+  optionALabel?: string
+  optionBLabel?: string
+}
 
 type PollRow = {
   id: string
@@ -42,6 +52,10 @@ type PollRow = {
   endsAt?: string | null
   require_region?: boolean | null
   requireRegion?: boolean | null
+  option_a_label?: string | null
+  option_b_label?: string | null
+  optionALabel?: string | null
+  optionBLabel?: string | null
 }
 
 function normalizeEndsAt(value: string | null | undefined): string | null {
@@ -60,6 +74,14 @@ function toPoll(row: PollRow): Poll {
     createdAt: row.created_at ?? row.createdAt ?? "",
     endsAt: normalizeEndsAt(row.ends_at ?? row.endsAt ?? null),
     requireRegion: row.require_region ?? row.requireRegion ?? true,
+    optionALabel: normalizeOptionLabel(
+      row.option_a_label ?? row.optionALabel,
+      DEFAULT_OPTION_A_LABEL,
+    ),
+    optionBLabel: normalizeOptionLabel(
+      row.option_b_label ?? row.optionBLabel,
+      DEFAULT_OPTION_B_LABEL,
+    ),
   }
 }
 
@@ -91,6 +113,7 @@ export async function fetchPolls(): Promise<Poll[]> {
 
 export async function createPoll(input: CreatePollInput): Promise<Poll> {
   const endsAt = normalizeCreateEndsAt(input.endsAt)
+  const { optionALabel, optionBLabel } = resolveOptionLabels(input)
 
   const response = await fetch("/api/polls", {
     method: "POST",
@@ -101,6 +124,8 @@ export async function createPoll(input: CreatePollInput): Promise<Poll> {
       tag: input.tag,
       endsAt,
       requireRegion: input.requireRegion ?? true,
+      optionALabel,
+      optionBLabel,
     }),
   })
 
@@ -121,16 +146,9 @@ export async function createPoll(input: CreatePollInput): Promise<Poll> {
   return toPoll(body.poll)
 }
 
-export type UpdatePollInput = {
-  id: string
-  title: string
-  tag?: string
-  endsAt: string
-  requireRegion?: boolean
-}
-
 export async function updatePoll(input: UpdatePollInput): Promise<Poll> {
   const endsAt = normalizeCreateEndsAt(input.endsAt)
+  const { optionALabel, optionBLabel } = resolveOptionLabels(input)
 
   const response = await fetch("/api/polls", {
     method: "PATCH",
@@ -142,6 +160,8 @@ export async function updatePoll(input: UpdatePollInput): Promise<Poll> {
       tag: input.tag,
       endsAt,
       requireRegion: input.requireRegion ?? true,
+      optionALabel,
+      optionBLabel,
     }),
   })
 

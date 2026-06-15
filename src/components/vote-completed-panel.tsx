@@ -1,19 +1,27 @@
 import { Check, X } from "lucide-react"
+import {
+  DEFAULT_OPTION_A_LABEL,
+  DEFAULT_OPTION_B_LABEL,
+} from "@/lib/poll-options"
 import type { VoteChoice, VoteTotals } from "@/lib/votes"
 
 type VoteCompletedPanelProps = {
   userChoice: VoteChoice
   totals: VoteTotals
   loading?: boolean
+  optionALabel?: string
+  optionBLabel?: string
 }
-
 export function VoteCompletedPanel({
   userChoice,
   totals,
   loading = false,
+  optionALabel = DEFAULT_OPTION_A_LABEL,
+  optionBLabel = DEFAULT_OPTION_B_LABEL,
 }: VoteCompletedPanelProps) {
   const isAgree = userChoice === "agree"
-
+  const agreeLabel = optionALabel.trim() || DEFAULT_OPTION_A_LABEL
+  const disagreeLabel = optionBLabel.trim() || DEFAULT_OPTION_B_LABEL
   return (
     <section className="mt-6 rounded-3xl border border-border bg-card p-5">
       <p className="text-center text-sm font-bold text-foreground">
@@ -36,9 +44,8 @@ export function VoteCompletedPanel({
           <X className="size-5" strokeWidth={2.5} />
         )}
         <span className="text-base font-extrabold">
-          내 투표: {isAgree ? "찬성" : "반대"}
-        </span>
-      </div>
+          내 투표: {isAgree ? agreeLabel : disagreeLabel}
+        </span>      </div>
 
       <div className="mt-4">
         <div className="flex h-9 w-full overflow-hidden rounded-full border border-border">
@@ -57,14 +64,13 @@ export function VoteCompletedPanel({
         </div>
         <div className="mt-1.5 flex justify-between text-[11px] text-muted-foreground">
           <span>
-            전국 찬성{" "}
+            전국 {agreeLabel}{" "}
             {loading ? "" : `(${totals.agreeCount.toLocaleString()})`}
           </span>
           <span>
-            전국 반대{" "}
+            전국 {disagreeLabel}{" "}
             {loading ? "" : `(${totals.disagreeCount.toLocaleString()})`}
-          </span>
-        </div>
+          </span>        </div>
       </div>
     </section>
   )
